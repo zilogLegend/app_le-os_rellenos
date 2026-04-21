@@ -7,6 +7,8 @@ import imgBBQ from "./assets/bbq.png";
 import imgArrachera from "./assets/arrachera.png";
 import imgPollo from "./assets/pollo.png";
 import imgPolloPesto from "./assets/pollopesto.png";
+// IMPORTACIÓN DEL COMPONENTE DE SEGURIDAD
+import ComentariosSeguros from './Comentarios.jsx';
 
 // --- COMPONENTE DE BARRA DE PROGRESO ---
 const ProgressBar = ({ estado }) => {
@@ -81,7 +83,7 @@ function App() {
     if (showTracking && pedidoActualId) {
       interval = setInterval(async () => {
         try {
-          const res = await fetch(`http://localhost:5000/api/pedidos/${pedidoActualId}`);
+          const res = await fetch(`https://backend-le-os-production.up.railway.app/api/pedidos/${pedidoActualId}`);
           if (res.ok) {
             const data = await res.json();
             setTrackingEstado(data.estado);
@@ -94,7 +96,7 @@ function App() {
   }, [showTracking, pedidoActualId]);
 
   const cargarPedidos = () => {
-    fetch('http://localhost:8001/api/pedidos')
+    fetch('https://backend-le-os-production.up.railway.app/api/pedidos')
       .then(res => res.json())
       .then(data => {
         setPedidosBD(data);
@@ -111,7 +113,7 @@ function App() {
 
   const handleCompletarPedido = async (id) => {
     try {
-      const res = await fetch(`http://localhost:8001/api/pedidos/${id}`, {
+      const res = await fetch(`https://backend-le-os-production.up.railway.app/api/pedidos/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ estado: 'Completado' })
@@ -123,15 +125,13 @@ function App() {
   const handleBorrarPedido = async (id) => {
     if (window.confirm("¿Borrar registro?")) {
       try {
-        await fetch(`http://localhost:8001/api/pedidos/${id}`, { method: 'DELETE' });
+        await fetch(`https://backend-le-os-production.up.railway.app/api/pedidos/${id}`, { method: 'DELETE' });
         cargarPedidos();
       } catch (error) { console.error("Error:", error); }
     }
   };
 
-  // --- LÓGICA DE WHATSAPP Y VALIDACIÓN ---
   const handleConfirmarPedido = async () => {
-    // Validación de 10 dígitos exacta
     const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(phone)) {
       alert("Por favor, ingresa un número de teléfono válido de 10 dígitos.");
@@ -207,7 +207,7 @@ function App() {
 
   return (
     <div style={{ backgroundColor: colors.bg, color: colors.textMain, minHeight: "100vh", fontFamily: "Segoe UI, sans-serif" }}>
-      {/* MODAL DE AUTH (Se mantiene igual) */}
+      {/* MODAL DE AUTH */}
       {showAuthModal && (
         <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.85)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000 }}>
           <div style={{ background: colors.cardBg, padding: "40px", borderRadius: "20px", border: `1px solid ${colors.border}`, width: "90%", maxWidth: "400px", textAlign: "center", position: "relative" }}>
@@ -259,7 +259,6 @@ function App() {
       <main style={{ padding: "40px 5%" }}>
         {view === "home" || view === "productos" ? (
           <>
-            {/* Banner y Productos */}
             <div style={{ width: "100%", height: "350px", borderRadius: "20px", overflow: "hidden", marginBottom: "40px", position: "relative", border: `1px solid ${colors.border}` }}>
                 <img src={bannerPrincipal} alt="Banner" style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.7 }} />
                 <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 10%", background: "linear-gradient(to right, rgba(0,0,0,0.8), transparent)" }}>
@@ -283,29 +282,17 @@ function App() {
               ))}
             </div>
 
-            {/* FORMULARIO DE PEDIDO REDISEÑADO SEGÚN CAPTURA */}
+            {/* FORMULARIO DE PEDIDO */}
             <section style={{ maxWidth: "650px", margin: "40px auto", background: "#161311", padding: "40px", borderRadius: "25px", border: "1px solid #231F1C" }}>
               <h2 style={{ textAlign: "center", marginBottom: "35px", color: colors.accent, fontSize: "28px", fontWeight: "600" }}>Hacer Pedido por WhatsApp</h2>
-              
               <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                 <div style={{ display: "flex", gap: "15px" }}>
                   <input style={inputFormStyle} placeholder="Nombre" value={name} onChange={(e) => setName(e.target.value)} />
                   <input style={inputFormStyle} placeholder="Apellidos" value={apellidos} onChange={(e) => setApellidos(e.target.value)} />
                 </div>
-                
-                <input 
-                  style={inputFormStyle} 
-                  type="tel"
-                  maxLength="10"
-                  placeholder="Tu teléfono" 
-                  value={phone} 
-                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))} // Solo números
-                />
-                
+                <input style={inputFormStyle} type="tel" maxLength="10" placeholder="Tu teléfono" value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))} />
                 <input style={inputFormStyle} placeholder="Dirección completa de entrega" value={address} onChange={(e) => setAddress(e.target.value)} />
-                
                 <p style={{ color: "#8E8E8E", fontSize: "12px", textTransform: "uppercase", letterSpacing: "1px", marginTop: "10px" }}>Selecciona tus leños:</p>
-                
                 {carrito.map((item, index) => (
                   <div key={index} style={{ display: "flex", gap: "15px" }}>
                     <select style={{ ...inputFormStyle, flex: 3 }} value={item.leñoTipo} onChange={(e) => {
@@ -318,22 +305,8 @@ function App() {
                     }} />
                   </div>
                 ))}
-                
-                {/* Botón Añadir otro tipo */}
-                <button 
-                  onClick={addAnotherLeno}
-                  style={{ background: "transparent", border: "1px dashed #C76A2A", color: colors.accent, padding: "12px", borderRadius: "10px", cursor: "pointer", fontSize: "14px" }}
-                >
-                  + Añadir otro tipo de leño
-                </button>
-
-                <button 
-                  onClick={handleConfirmarPedido} 
-                  style={{ background: "#C76A2A", color: "white", padding: "18px", borderRadius: "12px", border: "none", fontWeight: "bold", cursor: "pointer", fontSize: "18px", marginTop: "10px", boxShadow: "0 4px 15px rgba(199, 106, 42, 0.3)" }}
-                >
-                  Confirmar Pedido 📱
-                </button>
-                
+                <button onClick={addAnotherLeno} style={{ background: "transparent", border: "1px dashed #C76A2A", color: colors.accent, padding: "12px", borderRadius: "10px", cursor: "pointer", fontSize: "14px" }}>+ Añadir otro tipo de leño</button>
+                <button onClick={handleConfirmarPedido} style={{ background: "#C76A2A", color: "white", padding: "18px", borderRadius: "12px", border: "none", fontWeight: "bold", cursor: "pointer", fontSize: "18px", marginTop: "10px", boxShadow: "0 4px 15px rgba(199, 106, 42, 0.3)" }}>Confirmar Pedido 📱</button>
                 {showTracking && <ProgressBar estado={trackingEstado} />}
               </div>
             </section>
@@ -360,6 +333,9 @@ function App() {
                     </div>
                 </section>
             )}
+
+            {/* SECCIÓN DE SEGURIDAD (COMENTARIOS) */}
+            <ComentariosSeguros />
           </>
         ) : null}
 
@@ -405,20 +381,7 @@ function App() {
 const navItemStyle = (isActive) => ({ cursor: "pointer", color: isActive ? "#FFFFFF" : "#A0A0A0", fontWeight: isActive ? "bold" : "normal", borderBottom: isActive ? "2px solid #C76A2A" : "none", paddingBottom: "5px" });
 const dropdownItemStyle = { padding: "10px", fontSize: "14px", cursor: "pointer", borderRadius: "4px" };
 const inputDarkStyle = { background: "#120F0D", border: "1px solid #2D2825", padding: "14px", borderRadius: "10px", color: "white", width: "100%", boxSizing: "border-box", outline: "none" };
-
-// Estilo específico para el formulario de la captura
-const inputFormStyle = { 
-  background: "#0D0B0A", 
-  border: "1px solid #25211E", 
-  padding: "16px", 
-  borderRadius: "12px", 
-  color: "#E0E0E0", 
-  width: "100%", 
-  boxSizing: "border-box", 
-  outline: "none",
-  fontSize: "14px"
-};
-
+const inputFormStyle = { background: "#0D0B0A", border: "1px solid #25211E", padding: "16px", borderRadius: "12px", color: "#E0E0E0", width: "100%", boxSizing: "border-box", outline: "none", fontSize: "14px" };
 const labelStyle = { fontSize: "11px", color: "#A0A0A0", textTransform: "uppercase", marginBottom: "5px" };
 
 export default App;
