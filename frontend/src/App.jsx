@@ -7,7 +7,9 @@ import imgBBQ from "./assets/bbq.png";
 import imgArrachera from "./assets/arrachera.png";
 import imgPollo from "./assets/pollo.png";
 import imgPolloPesto from "./assets/pollopesto.png";
+
 // IMPORTACIÓN DEL COMPONENTE DE SEGURIDAD
+// Asegúrate de que el archivo Comentarios.jsx esté en la misma carpeta src
 import ComentariosSeguros from './Comentarios.jsx';
 
 // --- COMPONENTE DE BARRA DE PROGRESO ---
@@ -333,9 +335,6 @@ function App() {
                     </div>
                 </section>
             )}
-
-            {/* SECCIÓN DE SEGURIDAD (COMENTARIOS) */}
-            <ComentariosSeguros />
           </>
         ) : null}
 
@@ -372,6 +371,11 @@ function App() {
             </div>
           </>
         )}
+
+        {/* SECCIÓN DE SEGURIDAD (COMENTARIOS) - Movida para asegurar visibilidad */}
+        <div style={{ width: '100%', clear: 'both' }}>
+           <ComentariosSeguros />
+        </div>
       </main>
     </div>
   );
