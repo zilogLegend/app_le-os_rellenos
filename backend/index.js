@@ -90,6 +90,7 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'healthy', service: 'Leños Rellenos API' });
 });
 
+// LOGIN
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -115,6 +116,7 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
+// CREAR PEDIDO
 app.post('/api/pedidos', async (req, res) => {
   try {
     const nuevoPedido = new Pedido(req.body);
@@ -128,6 +130,7 @@ app.post('/api/pedidos', async (req, res) => {
   }
 });
 
+// OBTENER TODOS LOS PEDIDOS
 app.get('/api/pedidos', async (req, res) => {
   try {
     const pedidos = await Pedido.find().sort({ fecha: -1 });
@@ -149,6 +152,7 @@ app.get('/api/pedidos', async (req, res) => {
   }
 });
 
+// OBTENER PEDIDO POR ID
 app.get('/api/pedidos/:id', async (req, res) => {
   try {
     const pedido = await Pedido.findById(req.params.id);
@@ -172,6 +176,7 @@ app.get('/api/pedidos/:id', async (req, res) => {
   }
 });
 
+// ACTUALIZAR ESTADO DEL PEDIDO
 app.patch('/api/pedidos/:id', async (req, res) => {
   try {
     const { estado } = req.body;
@@ -200,6 +205,7 @@ app.patch('/api/pedidos/:id', async (req, res) => {
   }
 });
 
+// ELIMINAR PEDIDO
 app.delete('/api/pedidos/:id', async (req, res) => {
   try {
     const result = await Pedido.findByIdAndDelete(req.params.id);
@@ -210,6 +216,13 @@ app.delete('/api/pedidos/:id', async (req, res) => {
   } catch (error) {
     res.status(500).json({ mensaje: error.message });
   }
+});
+
+// Endpoint Seguro para Comentarios
+app.post('/comentarios', (req, res) => {
+  const { texto } = req.body;
+  console.log("Comentario recibido:", texto);
+  res.json({ texto }); // Lo regresamos para probar el saneamiento en el frontend
 });
 
 const PORT = process.env.PORT || 5000;
