@@ -160,7 +160,7 @@ function App() {
     };
 
     try {
-      const res = await fetch('http://localhost:5000/api/pedidos', {
+      const res = await fetch('https://backend-le-os-production.up.railway.app/api/pedidos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(pedidoCompleto)
