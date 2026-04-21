@@ -2,22 +2,33 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const helmet = require('helmet'); // Importado para seguridad de cabeceras
 require('dotenv').config();
 
 const app = express();
 
-// Conectar a MongoDB Atlas
+// ============ CONFIGURACIÓN DE SEGURIDAD ============
+
+// 1. Helmet: Protege la app configurando varias cabeceras HTTP (oculta que usas Express, evita XSS, etc.)
+app.use(helmet());
+
+// 2. CORS Restringido: Solo permite peticiones desde tu frontend de Railway
+const corsOptions = {
+  origin: 'https://frontend-le-os-production.up.railway.app', // Tu URL de producción
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
+
+app.use(express.json());
+
+// ============ CONEXIÓN A BASE DE DATOS ============
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB Atlas Conectado'))
   .catch(err => console.error('❌ Error MongoDB:', err));
 
-// Middlewares
-app.use(cors());
-app.use(express.json());
-
 // ============ MODELOS ============
 
-// Modelo de Usuario
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
@@ -26,7 +37,6 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 
-// Modelo de Pedido
 const pedidoSchema = new mongoose.Schema({
   nombre: { type: String, required: true },
   apellidos: { type: String, required: true },
@@ -70,33 +80,27 @@ const seedUsers = async () => {
   }
 };
 
-// Ejecutar seed después de conectar
 mongoose.connection.once('open', () => {
   seedUsers();
 });
 
 // ============ RUTAS ============
 
-// Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'healthy', service: 'Leños Rellenos API' });
 });
 
-// LOGIN
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ detail: 'Usuario no encontrado' });
     }
-    
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ detail: 'Contraseña incorrecta' });
     }
-    
     res.json({
       success: true,
       user: {
@@ -111,7 +115,6 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// CREAR PEDIDO
 app.post('/api/pedidos', async (req, res) => {
   try {
     const nuevoPedido = new Pedido(req.body);
@@ -125,7 +128,6 @@ app.post('/api/pedidos', async (req, res) => {
   }
 });
 
-// OBTENER TODOS LOS PEDIDOS
 app.get('/api/pedidos', async (req, res) => {
   try {
     const pedidos = await Pedido.find().sort({ fecha: -1 });
@@ -147,7 +149,6 @@ app.get('/api/pedidos', async (req, res) => {
   }
 });
 
-// OBTENER PEDIDO POR ID
 app.get('/api/pedidos/:id', async (req, res) => {
   try {
     const pedido = await Pedido.findById(req.params.id);
@@ -171,7 +172,6 @@ app.get('/api/pedidos/:id', async (req, res) => {
   }
 });
 
-// ACTUALIZAR ESTADO DEL PEDIDO
 app.patch('/api/pedidos/:id', async (req, res) => {
   try {
     const { estado } = req.body;
@@ -200,7 +200,6 @@ app.patch('/api/pedidos/:id', async (req, res) => {
   }
 });
 
-// ELIMINAR PEDIDO
 app.delete('/api/pedidos/:id', async (req, res) => {
   try {
     const result = await Pedido.findByIdAndDelete(req.params.id);
@@ -214,4 +213,4 @@ app.delete('/api/pedidos/:id', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Servidor corriendo en puerto ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Servidor con Helmet y CORS seguro en puerto ${PORT}`));
