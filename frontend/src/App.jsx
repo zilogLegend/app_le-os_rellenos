@@ -387,5 +387,6 @@ const dropdownItemStyle = { padding: "10px", fontSize: "14px", cursor: "pointer"
 const inputDarkStyle = { background: "#120F0D", border: "1px solid #2D2825", padding: "14px", borderRadius: "10px", color: "white", width: "100%", boxSizing: "border-box", outline: "none" };
 const inputFormStyle = { background: "#0D0B0A", border: "1px solid #25211E", padding: "16px", borderRadius: "12px", color: "#E0E0E0", width: "100%", boxSizing: "border-box", outline: "none", fontSize: "14px" };
 const labelStyle = { fontSize: "11px", color: "#A0A0A0", textTransform: "uppercase", marginBottom: "5px" };
-//cambio de refuerzo
+//cambio de refuerzo 2
+//cambio
 export default App;
