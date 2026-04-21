@@ -10,7 +10,7 @@ import imgPolloPesto from "./assets/pollopesto.png";
 
 // IMPORTACIÓN DEL COMPONENTE DE SEGURIDAD
 // Asegúrate de que el archivo Comentarios.jsx esté en la misma carpeta src
-import ComentariosSeguros from './Comentarios';
+import ComentariosSeguros from './Comentarios.jsx';
 
 // --- COMPONENTE DE BARRA DE PROGRESO ---
 const ProgressBar = ({ estado }) => {
